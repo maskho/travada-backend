@@ -12,13 +12,22 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-public class JwtAuthenticationResponse {
-    private String token;
-    private String tokenType = "Bearer";
-    private String session;
+public class GetMyAccountDto {
 
-    public JwtAuthenticationResponse(String token,String pin) {
-        this.token = token;
-        this.session = pin;
-    }
+    private Long id;
+
+    private String namaLengkap;
+
+    private Long balance;
+
+    private String noRekening;
+
+    private String pin;
+
+    private String email;
+
+    private boolean isActive;
+
+    private boolean isAccepted;
+
 }

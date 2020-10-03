@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Component
 public interface DestinasiService {
+
     BaseResponse saveDestinasi(Destinasi destinasi, MultipartFile[] foto);
 
     BaseResponse findAll();

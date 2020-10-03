@@ -23,7 +23,7 @@ public class CicilanController {
     }
 
     @PutMapping("/{id}")
-    private BaseResponse updateCicilan(@PathVariable Long id, @RequestBody String status){
+    private BaseResponse updateCicilan(@PathVariable Long id, @RequestParam String status){
 
         BaseResponse baseResponse = new BaseResponse();
 

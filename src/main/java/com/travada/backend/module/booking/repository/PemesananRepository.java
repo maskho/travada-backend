@@ -11,6 +11,7 @@ import java.util.Optional;
 public interface PemesananRepository extends JpaRepository<Pemesanan, Long> {
     List<Pemesanan> findAllByDestinasiId(Long idDestinasi);
     List<Pemesanan> findAllByUserId(Long idUser);
+    List<Pemesanan> findAllByStatusEquals(String status);
 
     Optional<Pemesanan> findByDestinasiIdAndUserId(Long idDestinasi, Long idUser);
 }

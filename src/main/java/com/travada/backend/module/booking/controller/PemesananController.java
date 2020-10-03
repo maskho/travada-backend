@@ -5,12 +5,15 @@ import com.travada.backend.config.security.UserPrincipal;
 import com.travada.backend.module.booking.model.Cicilan;
 import com.travada.backend.module.booking.model.DTO.CreatePemesananDTO;
 import com.travada.backend.module.booking.model.DTO.DetailPemesananDTO;
+import com.travada.backend.module.booking.model.DTO.StatusPemesanan;
 import com.travada.backend.module.booking.model.Pemesan;
 import com.travada.backend.module.booking.model.Pemesanan;
 import com.travada.backend.module.booking.service.CicilanService;
 import com.travada.backend.module.booking.service.PemesanService;
 import com.travada.backend.module.booking.service.PemesananService;
+import com.travada.backend.module.trip.model.Destinasi;
 import com.travada.backend.module.trip.repository.DestinasiRepository;
+import com.travada.backend.module.trip.service.DestinasiService;
 import com.travada.backend.utils.BaseResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -36,53 +39,59 @@ public class PemesananController {
     private PemesanService pemesanService;
 
     @Autowired
-    private DestinasiRepository destinasiRepository;
+    private DestinasiService destinasiService;
 
     @GetMapping("/all")
     public BaseResponse getAll() {
         return pemesananService.findAll();
     }
 
-    @GetMapping("/destinasi/{idDestinasi}")
-    public BaseResponse getById(@CurrentUser UserPrincipal userPrincipal, @PathVariable Long idDestinasi) {
-        BaseResponse baseResponse = new BaseResponse();
-        DetailPemesananDTO detailPemesananDTO = new DetailPemesananDTO();
+//    @GetMapping("/destinasi/{idDestinasi}")
+//    public BaseResponse getById(@CurrentUser UserPrincipal userPrincipal, @PathVariable Long idDestinasi) {
+//        BaseResponse baseResponse = new BaseResponse();
+//        DetailPemesananDTO detailPemesananDTO = new DetailPemesananDTO();
+//
+//        Pemesanan pemesanan = pemesananService.findByDestinasiIdAndUserId(idDestinasi, userPrincipal.getId());
+//        List<Pemesan> pemesanList = pemesanService.getPemesan(pemesanan.getId());
+//        List<Cicilan> cicilanList = cicilanService.getCicilan(pemesanan.getId());
+//
+//        BaseResponse destinasi = destinasiService.findById(idDestinasi);
+//
+//        detailPemesananDTO.setPemesanan(pemesanan);
+//        detailPemesananDTO.setDestinasi((Destinasi) destinasi.getData());
+//        detailPemesananDTO.setPemesan(pemesanList);
+//        detailPemesananDTO.setCicilan(cicilanList);
+//
+//        baseResponse.setStatus(HttpStatus.OK);
+//        baseResponse.setData(detailPemesananDTO);
+//        baseResponse.setMessage("pengambilan detail pemesanan dengan id user " + userPrincipal.getId() + " dan id destinasi " + idDestinasi + " berhasil dilakukan");
+//        return baseResponse;
+//    }
 
-        Pemesanan pemesanan = pemesananService.findByDestinasiIdAndUserId(idDestinasi, userPrincipal.getId());
-        List<Pemesan> pemesanList = pemesanService.getPemesan(pemesanan.getId());
-        List<Cicilan> cicilanList = cicilanService.getCicilan(pemesanan.getId());
-
-        detailPemesananDTO.setPemesanan(pemesanan);
-        detailPemesananDTO.setPemesan(pemesanList);
-        detailPemesananDTO.setCicilan(cicilanList);
-
-        baseResponse.setStatus(HttpStatus.OK);
-        baseResponse.setData(detailPemesananDTO);
-        baseResponse.setMessage("pengambilan detail pemesanan dengan id user " + userPrincipal.getId() + " dan id destinasi " + idDestinasi + " berhasil dilakukan");
-        return baseResponse;
-    }
-
-    @GetMapping("{idUser}/destinasi/{idDestinasi}")
-    public BaseResponse getByIdUser(@PathVariable Long idUser, @PathVariable Long idDestinasi) {
-        BaseResponse baseResponse = new BaseResponse();
-        DetailPemesananDTO detailPemesananDTO = new DetailPemesananDTO();
-
-        Pemesanan pemesanan = pemesananService.findByDestinasiIdAndUserId(idDestinasi, idUser);
-        List<Pemesan> pemesanList = pemesanService.getPemesan(pemesanan.getId());
-        List<Cicilan> cicilanList = cicilanService.getCicilan(pemesanan.getId());
-
-        detailPemesananDTO.setPemesanan(pemesanan);
-        detailPemesananDTO.setPemesan(pemesanList);
-        detailPemesananDTO.setCicilan(cicilanList);
-
-        baseResponse.setStatus(HttpStatus.OK);
-        baseResponse.setData(detailPemesananDTO);
-        baseResponse.setMessage("pengambilan detail pemesanan dengan id user " + idUser + " dan id destinasi " + idDestinasi + " berhasil dilakukan");
-        return baseResponse;
-    }
+//    @GetMapping("{idUser}/destinasi/{idDestinasi}")
+//    public BaseResponse getByIdUser(@PathVariable Long idUser, @PathVariable Long idDestinasi) {
+//        BaseResponse baseResponse = new BaseResponse();
+//        DetailPemesananDTO detailPemesananDTO = new DetailPemesananDTO();
+//
+//        Pemesanan pemesanan = pemesananService.findByDestinasiIdAndUserId(idDestinasi, idUser);
+//        List<Pemesan> pemesanList = pemesanService.getPemesan(pemesanan.getId());
+//        List<Cicilan> cicilanList = cicilanService.getCicilan(pemesanan.getId());
+//
+//        BaseResponse destinasi = destinasiService.findById(idDestinasi);
+//
+//        detailPemesananDTO.setPemesanan(pemesanan);
+//        detailPemesananDTO.setDestinasi((Destinasi) destinasi.getData());
+//        detailPemesananDTO.setPemesan(pemesanList);
+//        detailPemesananDTO.setCicilan(cicilanList);
+//
+//        baseResponse.setStatus(HttpStatus.OK);
+//        baseResponse.setData(detailPemesananDTO);
+//        baseResponse.setMessage("pengambilan detail pemesanan dengan id user " + idUser + " dan id destinasi " + idDestinasi + " berhasil dilakukan");
+//        return baseResponse;
+//    }
 
     @GetMapping("/detail/{idPemesanan}")
-    public BaseResponse findById(@PathVariable Long idPemesanan){
+    public BaseResponse findById(@PathVariable Long idPemesanan) {
         BaseResponse baseResponse = new BaseResponse();
         DetailPemesananDTO detailPemesananDTO = new DetailPemesananDTO();
 
@@ -92,12 +101,13 @@ public class PemesananController {
         List<Cicilan> cicilanList = cicilanService.getCicilan(pemesanan.getId());
 
         detailPemesananDTO.setPemesanan(pemesanan);
+        detailPemesananDTO.setDestinasi(pemesanan.getDestinasi());
         detailPemesananDTO.setPemesan(pemesanList);
         detailPemesananDTO.setCicilan(cicilanList);
 
         baseResponse.setStatus(HttpStatus.OK);
         baseResponse.setData(detailPemesananDTO);
-        baseResponse.setMessage("pengambilan data pemesanan dengan id "+idPemesanan+" berhasil dilakukan");
+        baseResponse.setMessage("pengambilan data pemesanan dengan id " + idPemesanan + " berhasil dilakukan");
 
         return baseResponse;
     }
@@ -112,6 +122,24 @@ public class PemesananController {
         return pemesananService.findByIdUser(idUser);
     }
 
+    @GetMapping("/status/all")
+    public BaseResponse getAllByStatus(@RequestParam String[] status){
+        BaseResponse baseResponse = new BaseResponse();
+        if(status.length == 1) {
+            StatusPemesanan statusPemesanan = pemesananService.findByStatus(status[0]);
+            baseResponse.setData(statusPemesanan);
+        }else {
+            List<StatusPemesanan> statusPemesananList = new ArrayList<>();
+            for(String stat: status){
+                statusPemesananList.add(pemesananService.findByStatus(stat));
+            }
+            baseResponse.setData(statusPemesananList);
+        }
+        baseResponse.setStatus(HttpStatus.OK);
+        baseResponse.setMessage("List pemesanan dengan status "+status+" berhasil diambil");
+
+        return baseResponse;
+    }
 
     @PostMapping()
     public BaseResponse createPemesanan(@ModelAttribute CreatePemesananDTO pemesananDTO, @CurrentUser UserPrincipal user, @RequestParam MultipartFile[] foto_ktp, @RequestParam MultipartFile[] foto_paspor) {
@@ -248,9 +276,8 @@ public class PemesananController {
         return baseResponse;
     }
 
-
     @PutMapping("/{id}")
-    public BaseResponse updateStatusPemesanan(@PathVariable Long id, @RequestBody String status) {
+    public BaseResponse updateStatusPemesanan(@PathVariable Long id, @RequestParam String status) {
         BaseResponse baseResponse = new BaseResponse();
         Pemesanan pemesanan = pemesananService.updateStatusById(id, status);
 

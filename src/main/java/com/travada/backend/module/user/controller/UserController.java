@@ -1,5 +1,7 @@
 package com.travada.backend.module.user.controller;
 
+import com.travada.backend.config.security.CurrentUser;
+import com.travada.backend.config.security.UserPrincipal;
 import com.travada.backend.module.user.dto.*;
 import com.travada.backend.module.user.service.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,5 +52,12 @@ public class UserController {
     public ResponseEntity<?> authenticateUser(@RequestBody LoginDto loginDto) {
 
         return userService.authenticateUser(loginDto);
+    }
+
+    //Get my account
+    @GetMapping("/user/me")
+    public ResponseEntity<?> getMyAccount(@CurrentUser UserPrincipal userPrincipal) {
+
+        return userService.getMyAccount(userPrincipal);
     }
 }

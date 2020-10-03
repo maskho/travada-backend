@@ -22,4 +22,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     User findBynoHp(String noHp);
 
     List<User> findByStatus(String status);
+
+    User findBynoRekening(String noRekening);
 }

@@ -1,9 +1,14 @@
 package com.travada.backend.module.user.service;
 
 import com.cloudinary.utils.ObjectUtils;
+import com.travada.backend.bank.service.BankService;
 import com.travada.backend.config.CloudinaryConfig;
 import com.travada.backend.config.security.JwtTokenProvider;
+import com.travada.backend.config.security.UserPrincipal;
 import com.travada.backend.exception.AppException;
+import com.travada.backend.exception.ResourceNotFoundException;
+import com.travada.backend.module.transaksi.model.Saldo;
+import com.travada.backend.module.transaksi.repository.SaldoRepository;
 import com.travada.backend.module.user.dto.*;
 import com.travada.backend.module.user.model.Role;
 import com.travada.backend.module.user.model.RoleName;
@@ -13,6 +18,7 @@ import com.travada.backend.module.user.repository.UserRepository;
 import com.travada.backend.module.user.service.email.EmailService;
 import com.travada.backend.utils.BaseResponse;
 import com.travada.backend.utils.ModelMapperUtil;
+import com.travada.backend.utils.crypto.EncoderHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +32,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Random;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -55,6 +64,15 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     JwtTokenProvider tokenProvider;
+
+    @Autowired
+    BankService bankService;
+
+    @Autowired
+    EncoderHelper encoderHelper;
+
+    @Autowired
+    SaldoRepository saldoRepository;
 
 
     @Autowired
@@ -255,7 +273,7 @@ public class UserServiceImpl implements UserService {
                     String jwt = tokenProvider.generateToken(authentication);
                     return new ResponseEntity(new BaseResponse
                             (HttpStatus.OK,
-                                    new JwtAuthenticationResponse(jwt, pin),
+                                    new JwtAuthenticationResponse(jwt, encoderHelper.encryptBase64(pin)),
                                     "Login berhasil"),
                             HttpStatus.OK);
                 } else {
@@ -396,7 +414,7 @@ public class UserServiceImpl implements UserService {
             String jwt = tokenProvider.generateToken(authentication);
             return new ResponseEntity(new BaseResponse
                     (HttpStatus.OK,
-                            new JwtAuthenticationResponse(jwt, pin),
+                            new JwtAuthenticationResponse(jwt, encoderHelper.encryptBase64(pin)),
                             "Login berhasil"),
                     HttpStatus.OK);
 
@@ -467,4 +485,50 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Override
+    public ResponseEntity<?> getMyAccount(UserPrincipal userPrincipal) {
+        try{
+            String currentUsername = userPrincipal.getUsername();
+            User currentUser = userRepository.findByUsername(currentUsername)
+                    .orElseThrow(ResourceNotFoundException::new);
+
+            GetMyAccountDto getMyAccountDto = new GetMyAccountDto();
+            System.out.println(currentUser.getNoRekening());
+            System.out.println(currentUser.getPin());
+
+            Saldo saldo = saldoRepository.findByUserId(currentUser.getId());
+            System.out.println(saldo);
+            Long balance;
+            if(saldo == null) {
+                balance = 0L;
+            } else {
+                balance = saldo.getSaldo();
+            }
+
+//          String rawbalance = bankService.getBalance(currentUser.getNoRekening(), currentUser.getPin());
+            getMyAccountDto.setBalance(balance);
+            getMyAccountDto.setNamaLengkap(currentUser.getNamaLengkap());
+            getMyAccountDto.setId(currentUser.getId());
+            getMyAccountDto.setEmail(currentUser.getEmail());
+            getMyAccountDto.setNoRekening(currentUser.getNoRekening());
+            String encodedPin = encoderHelper.encryptBase64(currentUser.getPin());
+            getMyAccountDto.setPin(encodedPin);
+            getMyAccountDto.setActive(currentUser.isActive());
+            getMyAccountDto.setAccepted(currentUser.isAccepted());
+
+            return new ResponseEntity(new BaseResponse
+                    (HttpStatus.OK,
+                            getMyAccountDto,
+                            "Data user loaded"),
+                    HttpStatus.OK);
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return new ResponseEntity(new BaseResponse
+                    (HttpStatus.BAD_GATEWAY,
+                            null,
+                            "Server error"),
+                    HttpStatus.BAD_GATEWAY);
+        }
+    }
 }

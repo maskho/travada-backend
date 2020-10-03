@@ -3,6 +3,7 @@ package com.travada.backend.module.booking.service;
 import com.travada.backend.exception.DataNotFoundException;
 import com.travada.backend.module.booking.model.DTO.DetailPemesananDTO;
 import com.travada.backend.module.booking.model.DTO.PemesananDTO;
+import com.travada.backend.module.booking.model.DTO.StatusPemesanan;
 import com.travada.backend.module.booking.model.Pemesan;
 import com.travada.backend.module.booking.model.Pemesanan;
 import com.travada.backend.module.booking.repository.CicilanRepository;
@@ -43,7 +44,6 @@ public class PemesananServiceImpl implements PemesananService{
 
     @Autowired
     private ModelMapperUtil modelMapperUtil;
-
 
     @Override
     public Pemesanan savePemesanan(Long idUser, Long idDestinasi, Pemesanan pemesanan) {
@@ -108,6 +108,18 @@ public class PemesananServiceImpl implements PemesananService{
         baseResponse.setData(pemesananDTOS);
         baseResponse.setMessage("pengambilan list data pemesanan trip dengan id user "+idUser+" telah berhasil");
         return baseResponse;
+    }
+
+    @Override
+    public StatusPemesanan findByStatus(String status) {
+        BaseResponse baseResponse = new BaseResponse();
+        StatusPemesanan statusPemesanan = new StatusPemesanan();
+        List<Pemesanan> pemesananList = pemesananRepository.findAllByStatusEquals(status);
+        int total = pemesananList.size();
+        statusPemesanan.setTotal(total);
+        statusPemesanan.setPemesananList(pemesananList);
+
+        return statusPemesanan;
     }
 
     @Override

@@ -47,7 +47,6 @@ public class NasabahServiceImpl implements NasabahService {
                 users = userRepository.findAll();
             }
 
-            System.out.println(users);
             for (User user : users) {
                 ListUserDto userDto = modelMapperUtil
                         .modelMapperInit()

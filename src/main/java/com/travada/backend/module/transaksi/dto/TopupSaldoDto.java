@@ -1,4 +1,4 @@
-package com.travada.backend.module.user.dto;
+package com.travada.backend.module.transaksi.dto;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -12,13 +12,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-public class JwtAuthenticationResponse {
-    private String token;
-    private String tokenType = "Bearer";
-    private String session;
+public class TopupSaldoDto {
 
-    public JwtAuthenticationResponse(String token,String pin) {
-        this.token = token;
-        this.session = pin;
-    }
+    private Long amount;
+
 }

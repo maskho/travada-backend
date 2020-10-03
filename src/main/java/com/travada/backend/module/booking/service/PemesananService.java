@@ -1,5 +1,6 @@
 package com.travada.backend.module.booking.service;
 
+import com.travada.backend.module.booking.model.DTO.StatusPemesanan;
 import com.travada.backend.module.booking.model.Pemesan;
 import com.travada.backend.module.booking.model.Pemesanan;
 import com.travada.backend.utils.BaseResponse;
@@ -15,6 +16,8 @@ public interface PemesananService {
     BaseResponse findAll();
 
     BaseResponse findByIdUser(Long idUser);
+
+    StatusPemesanan findByStatus(String status);
 
     Pemesanan findByDestinasiIdAndUserId(Long idDestinasi, Long idUser);
 

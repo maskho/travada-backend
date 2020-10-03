@@ -1,5 +1,6 @@
 package com.travada.backend.module.user.service;
 
+import com.travada.backend.config.security.UserPrincipal;
 import com.travada.backend.module.user.dto.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -17,4 +18,6 @@ public interface UserService {
     public ResponseEntity<?> authenticateUser(LoginDto loginDto);
 
     public ResponseEntity<?> checkRegistration(CheckRegisDto checkRegisDto);
+
+    public ResponseEntity<?> getMyAccount(UserPrincipal userPrincipal);
 }
